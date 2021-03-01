@@ -73,11 +73,6 @@ module.exports = {
         comment: '文章',
       },
     );
-
-    await queryInterface.addIndex(tableName, ['key'], {
-      unique: true,
-      name: `idx_key`,
-    });
   },
 
   down: async queryInterface => {

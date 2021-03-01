@@ -12,6 +12,7 @@ import {
   UseGuards,
   Query,
   BadRequestException,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 import {
@@ -27,13 +28,107 @@ import {
   ArticleDto,
   CreateArticleDto,
   UpdateArticleDto,
+  ReqDataCountDto,
 } from './dtos'
 
 
+import { ArticleService } from './article.service';
 
 @Controller('v1/articles')
 @ApiTags('articles')
 export class ArticlesController {
+  constructor(
+    protected readonly articleService: ArticleService,
+  ) {}
+
+  /**
+   * 查看 列表
+   *
+   * @param where 搜索 条件
+   * @param page 当前页
+   * @param pageSize 每页展示数据条数
+   */
+  @Get()
+  @ApiOperation({
+    summary: '搜索文章列表'
+  })
+  @ApiQuery({
+    name: 'where[classification]',
+    description: '类型',
+    example: 'computer',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '当前页',
+    example: 1,
+    type: Number,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    description: '当前页',
+    example: 10,
+    type: Number,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'where',
+    description: 'where 汇总',
+    type: String,
+    required: false,
+  })
+  async search(
+    @Query('where') where: any,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('pageSize', ParseIntPipe) pageSize: number,
+    ): Promise<ArticleDto[]> {
+      const {
+        classification,
+      } = where;
+
+      const list = await this.articleService.search(
+        pageSize || 10,
+        page || 1,
+        {
+          ...(classification ? { classification } : {}),
+        } as Record<string, ArticleDto>,
+      );
+
+      return list;
+  }
+
+  /**
+   * 统计 总数
+   *
+   * @param where 搜索 条件
+   * @param page 当前页
+   * @param pageSize 每页展示数据条数
+   */
+  @Get('count')
+  @ApiOperation({ summary: '搜索教程统计' })
+  @ApiQuery({
+    name: 'where[classification]',
+    description: '类型',
+    example: 'computer',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'where',
+    description: 'where 汇总',
+    type: String,
+    required: false,
+  })
+  async countTotal(
+    @Query('where') where: any,
+    ): Promise<ReqDataCountDto> {
+      const count = await this.articleService.searchCount(where);
+
+      return { count };
+  }
+
 
   /**
    * 创建 Article  实例
@@ -42,51 +137,58 @@ export class ArticlesController {
    * @param user 操作用户
    *
    */
-  @Post('/')
+  @Post()
   @ApiOperation({
     summary: '创建文章',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'textbook主键',
-    type: Number,
-    required: true,
-  })
   async create(
-    @Body() materialDto: CreateArticleDto,
+    @Body() articleDto: CreateArticleDto,
     // @User() user: RequestUser,
   ): Promise<ArticleDto> {
-    const { sorting, unitId, type, sectionId, sameSectionGuid } = materialDto;
+    const instance = await this.articleService.create(articleDto);
 
-    if (!isValid) {
-      const errText = await this.i18n.translate('MATERIAL_ERR.REMOTE_ID_INVALID');
-      throw new BadRequestException(errText);
-    }
+    return instance;
+  }
 
+  /**
+   * 删除 Article 实例
+   *
+   * @param articleId 文章id
+   * @param user 操作用户
+   */
+  @Delete('/articles/:articleId(\\d+)')
+  @ApiOperation({
+    summary: '删除 文章数据',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiParam({ name: 'articleId', description: 'articleId', type: Number })
+  async delete(
+    @Param('articleId') articleId: number,
+    // @User() user: RequestUser,
+  ): Promise<ArticleDto> {
+    const instance = await this.articleService.removeByPk(articleId);
 
-    const remoteId = type === MATERIAL_TYPE.SAME ? sameSectionGuid: sectionId;
+    return instance;
+  }
 
-    const [unitInstance, remoteData] = await Promise.all([
-      this.unitService.findByPkBelong(
-        textbookIns.id,
-        unitId,
-      ),
-      this.remoteService.getRemoteById(type, remoteId)
-    ]);
-
-
-    const instance = await this.materialService.createBelong(
-      textbookIns,
-      unitInstance,
-      sorting,
-      {
-        ...materialDto,
-        title: materialDto.title || remoteData?.title,
-        videoDuration: remoteData?.play_time || 0,
-      }
-    );
-
-    await this.textbookService.doModify(textbookIns.id, user.username);
+  /**
+   * 更新 Article 实例
+   *
+   * @param articleId 文章id
+   * @param user 操作用户
+   */
+  @Put('/articles/:articleId(\\d+)')
+  @ApiOperation({
+    summary: '更新 文章数据',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiParam({ name: 'articleId', description: 'articleId', type: Number })
+  async updateByPk(
+    @Param('articleId') articleId: number,
+    @Body() updateDto: UpdateArticleDto,
+    // @User() user: RequestUser,
+  ): Promise<ArticleDto> {
+    const instance = await this.articleService.updateByPk(articleId, updateDto);
 
     return instance;
   }

@@ -1,17 +1,14 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { Column,
+  // Model,
+  Table, DataType } from 'sequelize-typescript';
+import { Model } from '../common/extends/base.model';
+
 
 @Table({
   tableName: 'articles',
   version: true,
 })
 export class Article extends Model<Article> {
-  @Column({
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  })
-  id: number;
-
   @Column({ type: DataType.STRING, allowNull: false })
   title: string;
 
@@ -25,20 +22,5 @@ export class Article extends Model<Article> {
   classification: string;
 
   @Column(DataType.INTEGER)
-  owner: string;
-
-  @Column({ type: DataType.DATE, field: 'created_at' })
-  createdAt: Date;
-
-  @Column({ type: DataType.DATE, field: 'updated_at' })
-  updatedAt: Date;
-
-  @Column({ type: DataType.DATE, field: 'deleted_at' })
-  deletedAt: Date;
-
-  @Column({ type: DataType.INTEGER, defaultValue: 0 })
-  version: number;
-
-  @Column({ type: DataType.BOOLEAN, defaultValue: false, field: 'is_deleted' })
-  isDeleted: boolean;
+  owner: number;
 }
