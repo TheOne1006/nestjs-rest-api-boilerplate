@@ -28,7 +28,19 @@ Visual Studio Code 配置目录
 
 ### `core`
 
-核心文件
+比较常用,高度依赖的模块
+
+> tips: 自定义核心文件, 根据需要自行可替换。
+
+
+- databases 数据库模块
+- filters 
+  - 处理各种异常
+- i18n 国际化模块
+- interceptors 拦截器
+  - 慢日志打印
+- logger 日志模块
+
 
 #### `filters`
 
@@ -43,7 +55,6 @@ Visual Studio Code 配置目录
 #### `i18n`
 
 国际化模块
-
 
 ## `app.module.ts`
 
