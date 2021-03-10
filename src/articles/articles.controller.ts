@@ -6,12 +6,12 @@ import {
   Get,
   Post,
   Delete,
-  UseInterceptors,
+  // UseInterceptors,
   Put,
   Param,
-  UseGuards,
+  // UseGuards,
   Query,
-  BadRequestException,
+  // BadRequestException,
   ParseIntPipe,
 } from '@nestjs/common';
 
@@ -19,7 +19,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiSecurity,
+  // ApiSecurity,
   ApiQuery,
   ApiParam,
 } from '@nestjs/swagger';
@@ -73,12 +73,12 @@ export class ArticlesController {
     type: Number,
     required: true,
   })
-  @ApiQuery({
-    name: 'where',
-    description: 'where 汇总',
-    type: String,
-    required: false,
-  })
+  // @ApiQuery({
+  //   name: 'where',
+  //   description: 'where 汇总',
+  //   type: String,
+  //   required: false,
+  // })
   async search(
     @Query('where') where: any,
     @Query('page', ParseIntPipe) page: number,
@@ -115,12 +115,12 @@ export class ArticlesController {
     type: String,
     required: false,
   })
-  @ApiQuery({
-    name: 'where',
-    description: 'where 汇总',
-    type: String,
-    required: false,
-  })
+  // @ApiQuery({
+  //   name: 'where',
+  //   description: 'where 汇总',
+  //   type: String,
+  //   required: false,
+  // })
   async countTotal(
     @Query('where') where: any,
     ): Promise<ReqDataCountDto> {

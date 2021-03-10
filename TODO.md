@@ -9,7 +9,6 @@
 5. https://codecov.io/
 6. https://snyk.io/
 7. online demo, herku
-8. remove `system-config` 过于复杂不易展示
-9. add `article` model
+8. add `article` model
     - 增删改查
-10. 身份验证
+9. 身份验证
